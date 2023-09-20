@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwardPacker", "EastwardPacker\EastwardPacker.csproj", "{60DD4608-6EF5-4568-BD69-166BADEBC293}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwardLib", "EastwardLib\EastwardLib.csproj", "{F2936D1F-E847-4396-B004-9843D216B959}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60DD4608-6EF5-4568-BD69-166BADEBC293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60DD4608-6EF5-4568-BD69-166BADEBC293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60DD4608-6EF5-4568-BD69-166BADEBC293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60DD4608-6EF5-4568-BD69-166BADEBC293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2936D1F-E847-4396-B004-9843D216B959}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2936D1F-E847-4396-B004-9843D216B959}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2936D1F-E847-4396-B004-9843D216B959}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2936D1F-E847-4396-B004-9843D216B959}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
