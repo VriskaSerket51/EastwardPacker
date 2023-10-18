@@ -1,29 +1,32 @@
-﻿using ZstdSharp;
+﻿using EastwardLib.Assets;
+using EastwardLib.MetaData;
+using ZstdSharp;
 
 namespace EastwardLib;
 
 public class GArchive : Dictionary<string, Asset>, IDisposable
 {
-    private const int MAGIC_HEADER = 27191;
-
-    public GArchive(int capacity) : base(capacity)
+    private const int MagicHeader = 27191;
+    
+    private GArchive(int capacity = 100) : base(capacity)
     {
     }
 
     public static GArchive Read(string path)
     {
-        return Read(File.OpenRead(path));
+        string archiveName = Path.GetFileNameWithoutExtension(path);
+        return Read(archiveName, File.OpenRead(path));
     }
 
-    public static GArchive Read(byte[] data)
+    public static GArchive Read(string archiveName, byte[] data)
     {
-        return Read(new MemoryStream(data));
+        return Read(archiveName, new MemoryStream(data));
     }
 
-    public static GArchive Read(Stream s)
+    public static GArchive Read(string archiveName, Stream s)
     {
         using BinaryReader br = new BinaryReader(s);
-        if (br.ReadInt32() != MAGIC_HEADER) // Yeah Magic Number
+        if (br.ReadInt32() != MagicHeader) // Yeah Magic Number
         {
             throw new Exception();
         }
@@ -45,13 +48,24 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
             if (isCompressed)
             {
                 using var decompressor = new Decompressor();
-                File.WriteAllBytes(@"C:\Users\i_am_\Desktop\fnt\test\tt", data);
                 data = decompressor.Unwrap(data).ToArray();
             }
 
             br.BaseStream.Position = position;
 
-            g.Add(name, Asset.Create(name, data));
+            if (!name.Contains("/"))
+            {
+                name = $"{archiveName}/{name}";
+                try
+                {
+                    g.Add(name, Asset.Create(name, data));
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+                // TODO support psd(decks)
+            }
         }
 
         s.Dispose();
@@ -93,7 +107,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
     public void Write(Stream s)
     {
         using BinaryWriter bw = new BinaryWriter(s);
-        bw.Write(MAGIC_HEADER);
+        bw.Write(MagicHeader);
         bw.Write(Count);
         int baseOffset = CalculateOffset();
         foreach (var (name, asset) in this)
@@ -114,26 +128,35 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
         }
     }
 
-    public void ExtractTo(string path, bool revealExtension = false)
+    public void ExtractTo(string path)
     {
         if (!Directory.Exists(path))
         {
             throw new Exception();
         }
 
+        AssetIndex assetIndex = AssetIndex.Instance;
+
         foreach (var (name, asset) in this)
         {
-            asset.SaveTo(Path.Combine(path, name), revealExtension);
+            AssetInfo? assetInfo = assetIndex.SearchAssetInfo(name);
+            if (assetInfo == null)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(assetInfo.Value.FilePath))
+            {
+                Console.WriteLine($"{assetInfo.Value.AssetName} has null path");
+                // TODO sus...
+                continue;
+            }
+            asset.SaveTo(Path.Combine(path, assetInfo.Value.FilePath));
         }
     }
 
     public void Dispose()
     {
-        foreach (var asset in Values)
-        {
-            asset.Dispose();
-        }
-
         Clear();
     }
 }
