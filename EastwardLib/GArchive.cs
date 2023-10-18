@@ -6,10 +6,13 @@ namespace EastwardLib;
 
 public class GArchive : Dictionary<string, Asset>, IDisposable
 {
-    private const int MagicHeader = 27191;
-    
-    private GArchive(int capacity = 100) : base(capacity)
+    private const int MAGIC_HEADER = 27191;
+
+    private string archiveName;
+
+    private GArchive(string name, int capacity = 100) : base(capacity)
     {
+        archiveName = name;
     }
 
     public static GArchive Read(string path)
@@ -26,13 +29,13 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
     public static GArchive Read(string archiveName, Stream s)
     {
         using BinaryReader br = new BinaryReader(s);
-        if (br.ReadInt32() != MagicHeader) // Yeah Magic Number
+        if (br.ReadInt32() != MAGIC_HEADER) // Yeah Magic Number
         {
             throw new Exception();
         }
 
         int length = br.ReadInt32();
-        GArchive g = new GArchive(length);
+        GArchive g = new GArchive(archiveName, length);
         for (int i = 0; i < length; i++)
         {
             string name = br.ReadNullTerminatedString();
@@ -60,7 +63,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
                 {
                     g.Add(name, Asset.Create(name, data));
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // ignored
                 }
@@ -107,12 +110,12 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
     public void Write(Stream s)
     {
         using BinaryWriter bw = new BinaryWriter(s);
-        bw.Write(MagicHeader);
+        bw.Write(MAGIC_HEADER);
         bw.Write(Count);
         int baseOffset = CalculateOffset();
         foreach (var (name, asset) in this)
         {
-            bw.WriteNullTerminatedString(name);
+            bw.WriteNullTerminatedString(name.Substring(archiveName.Length + 1));
             bw.Write(baseOffset);
             bw.Write(2);
             Compressor compressor = new Compressor();
@@ -151,6 +154,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
                 // TODO sus...
                 continue;
             }
+
             asset.SaveTo(Path.Combine(path, assetInfo.Value.FilePath));
         }
     }
