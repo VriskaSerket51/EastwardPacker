@@ -6,6 +6,9 @@ public class Options
 {
     [Option("index", Required = true, HelpText = "Set AssetIndex path.")]
     public required string AssetIndexPath { get; set; }
+    
+    [Option("script_lib", Required = true, HelpText = "Set ScriptLibrary path.")]
+    public required string ScriptLibraryPath { get; set; }
 
     [Option("r", Required = false, HelpText = "Whether use recursive mode or not.", Default = false)]
     public bool Recursive { get; set; }

@@ -8,7 +8,8 @@ Parser.Default.ParseArguments<Options>(args)
 
 void OnParsed(Options o)
 {
-    AssetIndex.Create(o.AssetIndexPath);
+    var scriptLibrary = ScriptLibrary.Create(o.ScriptLibraryPath);
+    AssetIndex.Create(o.AssetIndexPath, scriptLibrary);
 
     if (o.Recursive)
     {
@@ -33,7 +34,7 @@ void OnParsed(Options o)
     {
         if (o.InputFilePath == null)
         {
-            Console.WriteLine("'input' should not be null on recursive mode!!!");
+            Console.WriteLine("'input' should not be null!!!");
             return;
         }
 

@@ -23,7 +23,7 @@ public class AssetIndex : Dictionary<string, AssetInfo>
         }
     }
 
-    public static AssetIndex Create(string path)
+    public static AssetIndex Create(string path, ScriptLibrary? scriptLibrary = null)
     {
         if (_instance != null)
         {
@@ -47,10 +47,6 @@ public class AssetIndex : Dictionary<string, AssetInfo>
             string fileType = value["fileType"].Value;
             string type = value["type"].Value;
             var objectFilesNode = value["objectFiles"];
-            if (objectFilesNode.Count == 0)
-            {
-                continue;
-            }
 
             var objectFiles = new Dictionary<string, string>(objectFilesNode.Count);
             foreach (var (t, v) in objectFilesNode)
@@ -62,6 +58,12 @@ public class AssetIndex : Dictionary<string, AssetInfo>
             foreach (var v in objectFiles.Values)
             {
                 assetIndex.Add(v, assetInfo);
+            }
+
+            if (objectFiles.Count == 0 && scriptLibrary != null && scriptLibrary.TryGetValue(assetName, out var name))
+            {
+                objectFiles.Add("lua", name);
+                assetIndex.Add(name, assetInfo);
             }
         }
 

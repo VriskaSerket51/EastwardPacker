@@ -67,12 +67,20 @@ public class Asset
         return asset;
     }
 
+    public static T Create<T>(Stream s) where T : Asset, new()
+    {
+        T asset = new T();
+        asset.Decode(s);
+
+        return asset;
+    }
+
     public virtual byte[] Encode()
     {
         throw new Exception();
     }
 
-    public virtual void Decode(MemoryStream ms)
+    public virtual void Decode(Stream s)
     {
         throw new Exception();
     }
