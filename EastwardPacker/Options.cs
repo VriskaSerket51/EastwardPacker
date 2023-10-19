@@ -18,4 +18,7 @@ public class Options
 
     [Option('o', "output_dir", Required = true, HelpText = "Set Output directory path.")]
     public required string OutputDirectoryPath { get; set; }
+
+    [Option("fallback_dir", Required = false, HelpText = "Set Fallback directory path.")]
+    public string? FallbackDirectoryPath { get; set; }
 }

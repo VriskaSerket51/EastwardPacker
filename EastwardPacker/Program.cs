@@ -3,12 +3,22 @@ using EastwardLib;
 using EastwardLib.MetaData;
 using EastwardPacker;
 
-Parser.Default.ParseArguments<Options>(args)
-    .WithParsed(OnParsed);
+// Parser.Default.ParseArguments<Options>(args)
+    // .WithParsed(OnParsed);
+
+OnParsed(new Options()
+{
+    AssetIndexPath = @"C:\Users\i_am_\Downloads\quickbms\eastward\origin\config\asset_index",
+    Recursive = true,
+    InputDirectoryPath = @"C:\Users\i_am_\Downloads\quickbms\eastward\origin",
+    OutputDirectoryPath = @"C:\Users\i_am_\Desktop\eastward\project",
+    FallbackDirectoryPath = @"C:\Users\i_am_\Desktop\eastward\project\fallback"
+});
 
 void OnParsed(Options o)
 {
     AssetIndex.Create(o.AssetIndexPath);
+
     if (o.Recursive)
     {
         if (o.InputDirectoryPath == null)
@@ -25,7 +35,7 @@ void OnParsed(Options o)
             }
 
             var g = GArchive.Read(file);
-            g.ExtractTo(o.OutputDirectoryPath);
+            g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
         }
     }
     else
@@ -37,6 +47,6 @@ void OnParsed(Options o)
         }
 
         var g = GArchive.Read(o.InputFilePath);
-        g.ExtractTo(o.OutputDirectoryPath);
+        g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
     }
 }
