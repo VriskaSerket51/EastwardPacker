@@ -121,7 +121,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
         }
     }
 
-    public void ExtractTo(string path, string fallbackPath)
+    public void ExtractTo(string path, string? fallbackPath)
     {
         if (!Directory.Exists(path))
         {
