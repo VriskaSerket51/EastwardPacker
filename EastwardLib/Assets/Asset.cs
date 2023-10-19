@@ -32,6 +32,11 @@ public class Asset
                 return Create<TextAsset>(data);
             }
 
+            if (extension == ".packed")
+            {
+                return Create<PackedAsset>(data);
+            }
+
             // if (!string.IsNullOrEmpty(extension))
             // {
             //     Console.WriteLine($"Warning: unhandled extension: {name}");
