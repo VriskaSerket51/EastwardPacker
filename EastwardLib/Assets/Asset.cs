@@ -53,7 +53,7 @@ public class Asset
             case "compiled":
                 return Create<PackedAsset>(data);
             default:
-                return Create<TextAsset>(data);
+                return Create<BinaryAsset>(data);
         }
     }
 
