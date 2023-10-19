@@ -25,9 +25,9 @@ public class TextAsset : Asset
         return Encoding.UTF8.GetBytes(_text);
     }
 
-    public override void Decode(MemoryStream ms)
+    public override void Decode(Stream s)
     {
-        using StreamReader sr = new StreamReader(ms);
+        using StreamReader sr = new StreamReader(s);
         _text = sr.ReadToEnd();
     }
 

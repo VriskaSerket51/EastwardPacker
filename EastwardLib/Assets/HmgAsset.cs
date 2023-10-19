@@ -74,9 +74,9 @@ public class HmgAsset : Asset
         return stream.ToArray();
     }
 
-    public override void Decode(MemoryStream ms)
+    public override void Decode(Stream s)
     {
-        using BinaryReader br = new BinaryReader(ms);
+        using BinaryReader br = new BinaryReader(s);
         if (new string(br.ReadChars(3)) != MagicHeader)
         {
             throw new Exception("This file is not Hmg File!!!");

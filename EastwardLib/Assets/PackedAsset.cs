@@ -20,9 +20,9 @@ public class PackedAsset : Asset
         return MessagePackSerializer.Serialize(_obj);
     }
 
-    public override void Decode(MemoryStream ms)
+    public override void Decode(Stream s)
     {
-        _obj = MessagePackSerializer.Deserialize<object>(ms);
+        _obj = MessagePackSerializer.Deserialize<object>(s);
     }
 
     public override void SaveTo(string path)

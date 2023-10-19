@@ -23,9 +23,10 @@ public class BinaryAsset : Asset
         return _data;
     }
 
-    public override void Decode(MemoryStream ms)
+    public override void Decode(Stream s)
     {
-        _data = ms.ToArray();
+        using BinaryReader br = new BinaryReader(s);
+        _data = br.ReadBytes((int)s.Length);
     }
 
     public override void SaveTo(string path)
