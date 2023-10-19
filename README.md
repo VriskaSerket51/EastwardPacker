@@ -28,13 +28,16 @@ g["foo"] = new TextAsset("bar");
 g.Write("locale_new.g");
 ```
 
-`Warning: You must load AssetIndex at first!`
+> **Warning**
+> <br>
+> You must create AssetIndex at first!
 
 ## Features
 - Can extract various assets
   - Hmg Texture
   - Packed Data
-  - Or just text files
+  - Deck files
+  - Scenes
+  - ETC
   - For mSprite animations, please check [here](https://github.com/VriskaSerket51/EastwardMSpriteParser).
-  - [Now working] deck files
 - Create your custom assets, and add into ".g" archive.
