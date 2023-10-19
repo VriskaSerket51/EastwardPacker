@@ -4,12 +4,40 @@ namespace EastwardLib.Assets;
 
 public class Asset
 {
-    public static Asset Create(string name, byte[] data)
+    public static Asset Create(string name, byte[] data, bool isPackage = false)
     {
+        string originName = name;
+        if (isPackage)
+        {
+            var split = name.Split('/');
+            name = $"{split[0]}/{split[1]}";
+        }
+
         var assetInfo = AssetIndex.Instance.SearchAssetInfo(name);
         if (!assetInfo.HasValue)
         {
-            throw new Exception($"AssetIndex doesn't contain the asset info: {name}");
+            return Create<FallbackAsset>(data);
+        }
+
+        if (isPackage)
+        {
+            var extension = Path.GetExtension(originName);
+            if (extension == ".hmg")
+            {
+                return Create<HmgAsset>(data);
+            }
+
+            if (extension == ".json")
+            {
+                return Create<TextAsset>(data);
+            }
+
+            // if (!string.IsNullOrEmpty(extension))
+            // {
+            //     Console.WriteLine($"Warning: unhandled extension: {name}");
+            // }
+
+            return Create<BinaryAsset>(data);
         }
 
         switch (assetInfo.Value.ObjectFiles.First(o => o.Value == name).Key)

@@ -6,13 +6,13 @@ namespace EastwardLib;
 
 public class GArchive : Dictionary<string, Asset>, IDisposable
 {
-    private const int MAGIC_HEADER = 27191;
+    private const int MagicHeader = 27191;
 
-    private string archiveName;
+    private readonly string _archiveName;
 
     private GArchive(string name, int capacity = 100) : base(capacity)
     {
-        archiveName = name;
+        _archiveName = name;
     }
 
     public static GArchive Read(string path)
@@ -29,7 +29,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
     public static GArchive Read(string archiveName, Stream s)
     {
         using BinaryReader br = new BinaryReader(s);
-        if (br.ReadInt32() != MAGIC_HEADER) // Yeah Magic Number
+        if (br.ReadInt32() != MagicHeader) // Yeah Magic Number
         {
             throw new Exception();
         }
@@ -56,19 +56,9 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
 
             br.BaseStream.Position = position;
 
-            if (!name.Contains("/"))
-            {
-                name = $"{archiveName}/{name}";
-                try
-                {
-                    g.Add(name, Asset.Create(name, data));
-                }
-                catch (Exception e)
-                {
-                    // ignored
-                }
-                // TODO support psd(decks)
-            }
+            bool isPackage = name.Contains('/');
+            string fullName = $"{archiveName}/{name}";
+            g.Add(fullName, Asset.Create(fullName, data, isPackage));
         }
 
         s.Dispose();
@@ -110,12 +100,12 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
     public void Write(Stream s)
     {
         using BinaryWriter bw = new BinaryWriter(s);
-        bw.Write(MAGIC_HEADER);
+        bw.Write(MagicHeader);
         bw.Write(Count);
         int baseOffset = CalculateOffset();
         foreach (var (name, asset) in this)
         {
-            bw.WriteNullTerminatedString(name.Substring(archiveName.Length + 1));
+            bw.WriteNullTerminatedString(name.Substring(_archiveName.Length + 1));
             bw.Write(baseOffset);
             bw.Write(2);
             Compressor compressor = new Compressor();
@@ -131,7 +121,7 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
         }
     }
 
-    public void ExtractTo(string path)
+    public void ExtractTo(string path, string fallbackPath)
     {
         if (!Directory.Exists(path))
         {
@@ -142,20 +132,81 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
 
         foreach (var (name, asset) in this)
         {
-            AssetInfo? assetInfo = assetIndex.SearchAssetInfo(name);
-            if (assetInfo == null)
+            if (asset is FallbackAsset)
             {
+                if (!string.IsNullOrEmpty(fallbackPath))
+                {
+                    asset.SaveTo(Path.Combine(fallbackPath, name));
+                }
+
                 continue;
             }
 
-            if (string.IsNullOrEmpty(assetInfo.Value.FilePath))
-            {
-                Console.WriteLine($"{assetInfo.Value.AssetName} has null path");
-                // TODO sus...
-                continue;
-            }
+            continue;
 
-            asset.SaveTo(Path.Combine(path, assetInfo.Value.FilePath));
+            string originName = name.Substring(_archiveName.Length + 1);
+            bool isPackage = originName.Contains('/');
+
+            if (isPackage)
+            {
+                var split = originName.Split('/');
+                string containerName = $"{_archiveName}/{split[0]}";
+                AssetInfo? assetInfo = assetIndex.SearchAssetInfo(containerName);
+                if (assetInfo == null)
+                {
+                    Console.WriteLine($"{containerName} has null asset info");
+                    continue;
+                }
+
+                if (assetInfo.Value.FileType == "f")
+                {
+                    // WTF?!
+                    continue;
+                }
+
+                asset.SaveTo(Path.Combine(path, assetInfo.Value.FilePath,
+                    originName.Substring(split[0].Length + 1)));
+            }
+            else
+            {
+                AssetInfo? assetInfo = assetIndex.SearchAssetInfo(name);
+                if (assetInfo == null)
+                {
+                    Console.WriteLine($"{name} has null asset info");
+                    continue;
+                }
+
+                string assetName = assetInfo.Value.AssetName;
+                string filePath = assetInfo.Value.FilePath;
+                string fileType = assetInfo.Value.FileType;
+                var objectFiles = assetInfo.Value.ObjectFiles;
+                string type = assetInfo.Value.Type;
+
+                if (fileType == "d")
+                {
+                    string key = objectFiles.First(o => o.Value == name).Key;
+                    asset.SaveTo(Path.Combine(path, filePath, key));
+                }
+                else if (fileType == "v")
+                {
+                    if (type == "texture")
+                    {
+                        string mSpriteName = assetName.Substring(0, assetName.Length - 9);
+                        var mSpriteInfo = assetIndex.GetAssetInfoByName(mSpriteName);
+                        if (mSpriteInfo == null)
+                        {
+                            continue;
+                        }
+
+                        asset.SaveTo(Path.Combine(path, Path.GetDirectoryName(mSpriteInfo.Value.FilePath)!,
+                            assetName + ".png"));
+                    }
+                }
+                else if (fileType == "f")
+                {
+                    asset.SaveTo(Path.Combine(path, filePath));
+                }
+            }
         }
     }
 

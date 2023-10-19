@@ -44,6 +44,7 @@ public class AssetIndex : Dictionary<string, AssetInfo>
         {
             string assetName = key;
             string filePath = value["filePath"].IsString ? value["filePath"].Value : string.Empty;
+            string fileType = value["fileType"].Value;
             string type = value["type"].Value;
             var objectFilesNode = value["objectFiles"];
             if (objectFilesNode.Count == 0)
@@ -57,7 +58,7 @@ public class AssetIndex : Dictionary<string, AssetInfo>
                 objectFiles.Add(t, v.Value);
             }
 
-            var assetInfo = new AssetInfo(assetName, filePath, objectFiles, type);
+            var assetInfo = new AssetInfo(Path.GetFileName(assetName), filePath, fileType, objectFiles, type);
             foreach (var v in objectFiles.Values)
             {
                 assetIndex.Add(v, assetInfo);
@@ -75,5 +76,18 @@ public class AssetIndex : Dictionary<string, AssetInfo>
         }
 
         return this[key];
+    }
+
+    public AssetInfo? GetAssetInfoByName(string name)
+    {
+        foreach (var (_, value) in this)
+        {
+            if (value.AssetName == name)
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 }
