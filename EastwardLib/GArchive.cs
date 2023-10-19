@@ -142,8 +142,6 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
                 continue;
             }
 
-            continue;
-
             string originName = name.Substring(_archiveName.Length + 1);
             bool isPackage = originName.Contains('/');
 
