@@ -3,17 +3,8 @@ using EastwardLib;
 using EastwardLib.MetaData;
 using EastwardPacker;
 
-// Parser.Default.ParseArguments<Options>(args)
-    // .WithParsed(OnParsed);
-
-OnParsed(new Options()
-{
-    AssetIndexPath = @"C:\Users\i_am_\Downloads\quickbms\eastward\origin\config\asset_index",
-    Recursive = true,
-    InputDirectoryPath = @"C:\Users\i_am_\Downloads\quickbms\eastward\origin",
-    OutputDirectoryPath = @"C:\Users\i_am_\Desktop\eastward\project",
-    FallbackDirectoryPath = @"C:\Users\i_am_\Desktop\eastward\project\fallback"
-});
+Parser.Default.ParseArguments<Options>(args)
+    .WithParsed(OnParsed);
 
 void OnParsed(Options o)
 {
