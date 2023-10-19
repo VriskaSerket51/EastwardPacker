@@ -17,7 +17,6 @@ You can extract assets in ".g" files.
 By importing "EastwardLib.dll", you can handle Assets and GArchives.
 
 For example,
-<br>
 ```cs
 using EastwardLib;
 using EastwardLib.MetaData;
@@ -29,7 +28,6 @@ g.Write("locale_new.g");
 ```
 
 > **Warning**
-> <br>
 > You must create AssetIndex at first!
 
 ## Features
