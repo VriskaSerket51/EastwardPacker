@@ -4,9 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwardPacker", "EastwardP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwardLib", "EastwardLib\EastwardLib.csproj", "{F2936D1F-E847-4396-B004-9843D216B959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmgExtractor", "HmgExtractor\HmgExtractor.csproj", "{D0A45DD0-0930-462D-B1A9-85A968C6199F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hmg2Image", "Hmg2Image\Hmg2Image.csproj", "{D0A45DD0-0930-462D-B1A9-85A968C6199F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasUnpacker", "AtlasUnpacker\AtlasUnpacker.csproj", "{FF18A2D0-FB41-41AC-9F32-AF1C1C30234E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasExtractor", "AtlasExtractor\AtlasExtractor.csproj", "{FF18A2D0-FB41-41AC-9F32-AF1C1C30234E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image2Hmg", "Image2Hmg\Image2Hmg.csproj", "{9B157D81-A5C0-4B6A-A3F1-4698E450614E}"
 EndProject
