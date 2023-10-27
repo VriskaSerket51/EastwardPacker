@@ -11,6 +11,6 @@ foreach (var arg in args)
     }
     catch (Exception e)
     {
-        Console.WriteLine(e.Message);
+        Console.WriteLine($"Exception from {arg}, message: {e.Message}");
     }
 }

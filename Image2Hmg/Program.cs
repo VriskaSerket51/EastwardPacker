@@ -3,12 +3,19 @@ using EastwardLib.Assets;
 
 foreach (var arg in args)
 {
-    if (!File.Exists(arg))
+    try
     {
-        continue;
-    }
+        if (!File.Exists(arg))
+        {
+            continue;
+        }
 
-    var asset = new HmgAsset(Image.FromFile(arg));
-    var data = asset.Encode();
-    File.WriteAllBytes(arg + ".encoded", data);
+        var asset = new HmgAsset(Image.FromFile(arg));
+        var data = asset.Encode();
+        File.WriteAllBytes(arg + ".hmg", data);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Exception from {arg}, message: {e.Message}");
+    }
 }
