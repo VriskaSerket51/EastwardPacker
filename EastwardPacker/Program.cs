@@ -3,8 +3,12 @@ using EastwardLib;
 using EastwardLib.MetaData;
 using EastwardPacker;
 
+#if DEBUG
+Test.DoTest();
+#else
 Parser.Default.ParseArguments<Options>(args)
     .WithParsed(OnParsed);
+#endif
 
 void OnParsed(Options o)
 {
