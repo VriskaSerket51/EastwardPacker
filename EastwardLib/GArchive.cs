@@ -121,11 +121,11 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
         }
     }
 
-    public void ExtractTo(string path, string? fallbackPath)
+    public void ExtractTo(string path, string? fallbackPath = null)
     {
         if (!Directory.Exists(path))
         {
-            throw new Exception();
+            Directory.CreateDirectory(path);
         }
 
         AssetIndex assetIndex = AssetIndex.Instance;
@@ -189,12 +189,14 @@ public class GArchive : Dictionary<string, Asset>, IDisposable
                 {
                     if (type == "texture")
                     {
-                        string mSpriteName = assetName.Substring(0, assetName.Length - 9);
+                        string mSpriteName = $"{assetName.Substring(0, assetName.Length - 8)}.msprite";
                         var mSpriteInfo = assetIndex.GetAssetInfoByName(mSpriteName);
                         if (mSpriteInfo == null)
                         {
                             continue;
                         }
+
+                        Console.WriteLine(mSpriteInfo.Value.FilePath);
 
                         asset.SaveTo(Path.Combine(path, Path.GetDirectoryName(mSpriteInfo.Value.FilePath)!,
                             assetName + ".png"));
