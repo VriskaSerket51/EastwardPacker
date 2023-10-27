@@ -5,7 +5,7 @@ EastwardPacker
 All releases can be found at [here](https://github.com/VriskaSerket51/EastwardPacker/releases).
 
 ## How to use
-### Console
+### EastwardPacker
 You can extract assets in ".g" files.
 
 - Single file extraction
@@ -13,7 +13,7 @@ You can extract assets in ".g" files.
 - Multiple files extraction
 `EastwardPacker.exe --r --index {index_path} --input_dir {input_path} -o {output_path}`
 
-### Library
+### EastwardLib
 By importing "EastwardLib.dll", you can handle Assets and GArchives.
 
 For example,
@@ -29,6 +29,15 @@ g.Write("locale_new.g");
 
 > **Warning**
 > You must create AssetIndex at first!
+
+### AtlasExtractor
+Pass multiple files through args, and extract images from each atlas file.
+
+### Hmg2Image
+Pass multiple files through args, and decode hmg files to images.
+
+### Image2Hmg
+Pass multiple files through args, and encode images to hmg files.
 
 ## Features
 - Can extract various assets
