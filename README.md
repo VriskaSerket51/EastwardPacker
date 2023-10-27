@@ -30,6 +30,7 @@ g.Write("locale_new.g");
 > **Warning**
 > You must create AssetIndex at first!
 
+## Tools
 ### AtlasExtractor
 Pass multiple files through args, and extract images from each atlas file.
 
