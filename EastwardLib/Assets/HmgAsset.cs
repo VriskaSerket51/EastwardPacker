@@ -22,7 +22,7 @@ public class HmgAsset : Asset
         _width = src.Width;
         _height = src.Height;
 
-        src.RotateFlip(RotateFlipType.RotateNoneFlipX);
+        src.RotateFlip(RotateFlipType.RotateNoneFlipY);
         using MemoryStream bmp = new MemoryStream();
         src.Save(bmp, ImageFormat.Bmp);
         using BinaryReader br = new BinaryReader(bmp);
@@ -40,10 +40,10 @@ public class HmgAsset : Asset
             var g = br.ReadByte();
             var r = br.ReadByte();
             var a = br.ReadByte();
-            _bitmapData[i] = a;
-            _bitmapData[i + 1] = b;
-            _bitmapData[i + 2] = g;
-            _bitmapData[i + 3] = r;
+            _bitmapData[i] = r;
+            _bitmapData[i + 1] = g;
+            _bitmapData[i + 2] = b;
+            _bitmapData[i + 3] = a;
         }
     }
 
@@ -54,7 +54,7 @@ public class HmgAsset : Asset
             throw new InvalidOperationException("You should Encode() after Decode()");
         }
 
-        using MemoryStream stream = new MemoryStream(_bitmapData);
+        using MemoryStream stream = new MemoryStream();
         using BinaryWriter bw = new BinaryWriter(stream);
         byte[] compressedData = new byte[LZ4Codec.MaximumOutputSize(_bitmapData.Length)];
         int length = LZ4Codec.Encode(_bitmapData, compressedData);
@@ -62,7 +62,7 @@ public class HmgAsset : Asset
         bw.Write((byte)2);
         bw.Write(GetFileSize(length));
         bw.Write((ushort)24984);
-        bw.Write(_bitmapData.Length);
+        bw.Write(length);
         bw.Write(_width);
         bw.Write(_height);
         bw.Write((byte)32);
