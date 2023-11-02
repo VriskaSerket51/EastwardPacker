@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasExtractor", "AtlasExtr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image2Hmg", "Image2Hmg\Image2Hmg.csproj", "{9B157D81-A5C0-4B6A-A3F1-4698E450614E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EastwardLib", "EastwardLib\EastwardLib.csproj", "{97842996-1012-4C8B-9C98-8C4D4E64256A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{9B157D81-A5C0-4B6A-A3F1-4698E450614E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B157D81-A5C0-4B6A-A3F1-4698E450614E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B157D81-A5C0-4B6A-A3F1-4698E450614E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97842996-1012-4C8B-9C98-8C4D4E64256A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97842996-1012-4C8B-9C98-8C4D4E64256A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97842996-1012-4C8B-9C98-8C4D4E64256A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97842996-1012-4C8B-9C98-8C4D4E64256A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
