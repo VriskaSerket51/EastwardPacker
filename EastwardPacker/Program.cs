@@ -31,7 +31,7 @@ void OnParsed(Options o)
             }
 
             var g = GArchive.Read(file);
-            // g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
+            g.ExtractTo(Path.Combine(o.OutputDirectoryPath, Path.GetFileName(file)));
         }
     }
     else
@@ -43,6 +43,6 @@ void OnParsed(Options o)
         }
 
         var g = GArchive.Read(o.InputFilePath);
-        // g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
+        g.ExtractTo(Path.Combine(o.OutputDirectoryPath, Path.GetFileName(o.InputFilePath)));
     }
 }
