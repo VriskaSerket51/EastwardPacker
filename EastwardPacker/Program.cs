@@ -12,8 +12,8 @@ Parser.Default.ParseArguments<Options>(args)
 
 void OnParsed(Options o)
 {
-    var scriptLibrary = ScriptLibrary.Create(o.ScriptLibraryPath);
-    AssetIndex.Create(o.AssetIndexPath, scriptLibrary);
+    ScriptLibrary.Create(o.ScriptLibraryPath);
+    AssetIndex.Create(o.AssetIndexPath);
 
     if (o.Recursive)
     {
@@ -31,7 +31,7 @@ void OnParsed(Options o)
             }
 
             var g = GArchive.Read(file);
-            g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
+            // g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
         }
     }
     else
@@ -43,6 +43,6 @@ void OnParsed(Options o)
         }
 
         var g = GArchive.Read(o.InputFilePath);
-        g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
+        // g.ExtractTo(o.OutputDirectoryPath, o.FallbackDirectoryPath);
     }
 }
