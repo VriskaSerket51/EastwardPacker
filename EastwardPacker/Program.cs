@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using EastwardLib;
+using EastwardLib.Assets;
 using EastwardLib.MetaData;
 using EastwardPacker;
 
