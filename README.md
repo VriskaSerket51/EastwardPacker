@@ -15,8 +15,50 @@ You can extract assets in ".g" files.
 
 ### EastwardLib
 By importing "EastwardLib.dll", you can handle Assets and GArchives.
-<br/>
-For more description, please check [here](https://github.com/VriskaSerket51/EastwardLib).
+
+Example for inserting new asset into archive.
+```cs
+using EastwardLib.Assets;
+using EastwardLib.MetaData;
+
+var g = GArchive.Read("locale.g");
+g["foo"] = new TextAsset("bar").Encode();
+g.Write("locale_new.g");
+```
+
+Example for extracting from archive.
+```cs
+using EastwardLib.Assets;
+using EastwardLib.MetaData;
+
+var g = GArchive.Read("locale.g");
+g.ExtractTo("./locale_extracted");
+```
+
+Example for extracting assets with restoring filename.
+```cs
+using EastwardLib.Assets;
+using EastwardLib.MetaData;
+
+var assetManager = AssetManager.Create(assetIndexPath, scriptLibraryPath, textureIndexPath);
+foreach (var file in Directory.GetFiles(inputDirPath))
+{
+    try
+    {
+        assetManager.LoadArchive(GArchive.Read(file));
+    }
+    catch (Exception)
+    {
+    }
+}
+assetManager.RootDirectory = rootDirectory;
+assetManager.LoadAssets();
+assetManager.ExtractTo(outputDirPath);
+```
+> **Warning**
+> AssetManager.LoadAssets() load all assets, it might consumes a bunch of memories.
+
+Currently, you cannot export lua, audio and some textures.
 
 ## Tools
 ### AtlasExtractor
