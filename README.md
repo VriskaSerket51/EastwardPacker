@@ -58,7 +58,8 @@ assetManager.ExtractTo(outputDirPath);
 > **Warning**
 > AssetManager.LoadAssets() load all assets, it might consumes a bunch of memories.
 
-Currently, you cannot export lua, audio and some textures.
+Currently, you cannot export audio assets.
+Some lua assets are precompiled with LuaJIT.
 
 ## Tools
 ### AtlasExtractor
