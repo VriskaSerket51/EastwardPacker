@@ -40,8 +40,8 @@ Example for extracting assets with restoring filename.
 using EastwardLib.Assets;
 using EastwardLib.MetaData;
 
-var assetManager = AssetManager.Create(assetIndexPath, scriptLibraryPath, textureIndexPath);
-foreach (var file in Directory.GetFiles(inputDirPath))
+var assetManager = AssetManager.Create("./asset_index", "./script_library", "./texture_index");
+foreach (var file in Directory.GetFiles("./archives"))
 {
     try
     {
@@ -51,9 +51,9 @@ foreach (var file in Directory.GetFiles(inputDirPath))
     {
     }
 }
-assetManager.RootDirectory = rootDirectory;
+assetManager.RootDirectory = "./";
 assetManager.LoadAssets();
-assetManager.ExtractTo(outputDirPath);
+assetManager.ExtractTo("./exported");
 ```
 > **Warning**
 > AssetManager.LoadAssets() load all assets, it might consumes a bunch of memories.
