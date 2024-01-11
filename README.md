@@ -22,7 +22,7 @@ using EastwardLib.Assets;
 using EastwardLib.MetaData;
 
 var g = GArchive.Read("locale.g");
-g["foo"] = new TextAsset("bar").Encode();
+g["locale/foo"] = new TextAsset("bar").Encode();
 g.Write("locale_new.g");
 ```
 
