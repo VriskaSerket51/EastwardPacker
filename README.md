@@ -1,6 +1,9 @@
 EastwardPacker
 =============
 
+## eastward.js
+You can also get [Javascript version of Eastward Packer](https://github.com/VriskaSerket51/eastward.js)!
+
 ## Download
 All releases can be found at [here](https://github.com/VriskaSerket51/EastwardPacker/releases).
 
