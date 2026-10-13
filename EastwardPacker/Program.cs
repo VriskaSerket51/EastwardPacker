@@ -1,5 +1,6 @@
 using CommandLine;
 using EastwardLib.Assets;
+using EastwardLib.Compilation;
 using EastwardLib.Utils;
 using EastwardPacker;
 
@@ -13,9 +14,9 @@ void OnParsed(Options options)
     {
         if (options.Pack)
         {
-            if (options.Assets || options.Project || options.InputDirectoryPath == null || options.OutputFilePath == null)
+            if (options.Compile || options.Assets || options.Project || options.InputDirectoryPath == null || options.OutputFilePath == null)
             {
-                throw new ArgumentException("--pack requires --input_dir and --output; asset source compilation is not supported.");
+                throw new ArgumentException("--pack requires --input_dir and --output. Use --compile for edited source assets.");
             }
 
             var input = Path.GetFullPath(options.InputDirectoryPath);
@@ -37,8 +38,25 @@ void OnParsed(Options options)
         }
         if (options.OutputDirectoryPath == null)
         {
-            throw new ArgumentException("Extraction requires --output_dir.");
+            throw new ArgumentException("Specify --output_dir.");
         }
+
+        if (options.Compile)
+        {
+            if (options.SourcePath == null || options.Assets || options.LuaSource || options.DecompilerPath != null || options.AssetType != null && !options.Project)
+                throw new ArgumentException("--compile requires --source and --asset, or --project; --type requires --project.");
+            if (options.Project == (options.AssetPath != null))
+                throw new ArgumentException("Choose --asset for one asset or --project for a restored source tree.");
+            var manager = LoadManager(options);
+            var compiler = new AssetCompiler(manager);
+            var resources = options.Project ? compiler.CompileProject(options.SourcePath, options.AssetType == null ? null : info => info.Type == options.AssetType)
+                : compiler.Compile(options.AssetPath!, options.SourcePath);
+            compiler.SaveTo(options.OutputDirectoryPath, resources);
+            Console.WriteLine($"Compiled {resources.Count} resource files: {options.OutputDirectoryPath}");
+            return;
+        }
+        if (options.SourcePath != null || options.AssetPath != null)
+            throw new ArgumentException("--source and --asset require --compile.");
 
         if (options.Assets || options.Project)
         {
@@ -48,34 +66,7 @@ void OnParsed(Options options)
             }
 
             using var decompiler = options.LuaSource || options.Project ? new NativeLuaDecompiler(options.DecompilerPath) : null;
-            var manager = options.ConfigPath != null ? AssetManager.Create(options.ConfigPath)
-                : options.AssetIndexPath != null && options.ScriptLibraryPath != null && options.TextureIndexPath != null
-                    ? AssetManager.Create(options.AssetIndexPath, options.ScriptLibraryPath, options.TextureIndexPath)
-                    : throw new ArgumentException("--assets requires --config or --index, --script_lib and --texture_index.");
-            if (options.InputDirectoryPath != null)
-            {
-                manager.RootDirectory = options.InputDirectoryPath;
-                foreach (var path in Directory.EnumerateFiles(options.InputDirectoryPath, "*.g", SearchOption.AllDirectories))
-                {
-                    manager.LoadArchive(GArchive.Read(path));
-                }
-            }
-            else if (options.InputFilePath != null)
-            {
-                manager.LoadArchive(GArchive.Read(options.InputFilePath));
-            }
-            else
-            {
-                throw new ArgumentException("--assets requires --input_dir or --input.");
-            }
-
-            if (options.OverlayDirectoryPath != null)
-            {
-                foreach (var path in Directory.EnumerateFiles(options.OverlayDirectoryPath, "*.g", SearchOption.AllDirectories))
-                {
-                    manager.LoadArchive(GArchive.Read(path));
-                }
-            }
+            var manager = LoadManager(options);
 
             var failures = 0;
             if (decompiler != null)
@@ -135,4 +126,22 @@ void OnParsed(Options options)
         Console.Error.WriteLine(e.Message);
         Environment.ExitCode = 1;
     }
+}
+
+AssetManager LoadManager(Options options)
+{
+    var manager = options.ConfigPath != null ? AssetManager.Create(options.ConfigPath)
+        : options.AssetIndexPath != null && options.ScriptLibraryPath != null && options.TextureIndexPath != null
+            ? AssetManager.Create(options.AssetIndexPath, options.ScriptLibraryPath, options.TextureIndexPath)
+            : throw new ArgumentException("Specify --config or --index, --script_lib and --texture_index.");
+    if (options.InputDirectoryPath != null)
+    {
+        manager.RootDirectory = options.InputDirectoryPath;
+        foreach (var path in Directory.EnumerateFiles(options.InputDirectoryPath, "*.g", SearchOption.AllDirectories)) manager.RegisterArchive(path);
+    }
+    else if (options.InputFilePath != null) manager.RegisterArchive(options.InputFilePath);
+    else throw new ArgumentException("Specify --input_dir or --input.");
+    if (options.OverlayDirectoryPath != null)
+        foreach (var path in Directory.EnumerateFiles(options.OverlayDirectoryPath, "*.g", SearchOption.AllDirectories)) manager.RegisterArchive(path);
+    return manager;
 }

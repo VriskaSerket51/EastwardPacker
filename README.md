@@ -72,7 +72,19 @@ Use a new output directory. The output contains `game/asset` with scenes, Lua, S
 
 The separate `restored.recovery.json` report lists missing resources, JPEG pixel alternatives and path changes. Use `--type` to select one asset type. `--project` and `--assets` are separate modes.
 
-Original project settings, Gii/AKU binaries and discarded editing history are not included. You need the matching editor environment to open and build the full project. Source-to-runtime compilation is not supported. Please check [EastwardLib](EastwardLib/README.md) for compatibility details.
+Original project settings, Gii/AKU binaries and discarded editing history are not included. You need the matching editor environment to open and build the full project. Please check [EastwardLib](EastwardLib/README.md) for compatibility details.
+
+### Source compilation
+
+You can compile edited sources into copies of the original archives.
+
+```sh
+dotnet run --project EastwardPacker -- --compile --asset script/example.sq --source ./edited/example.sq --config /path/to/content/game/config.g --input_dir /path/to/content/game -o ./compiled
+```
+
+Use `--project --source ./restored` instead of `--asset` to compile a restored tree with its recovery report. You can add `--type` to select one asset type and `--overlay` for DLC resources. Use a new output directory outside the game resources.
+
+Other archive entries are kept. Keep existing workbook sheet names and indexed atlas texture dimensions. Mesh materials are retained, and Lua source is saved without compiling LuaJIT bytecode. New assets need separate index registration.
 
 ### EastwardLib
 

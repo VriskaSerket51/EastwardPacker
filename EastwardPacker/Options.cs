@@ -4,6 +4,24 @@ namespace EastwardPacker;
 
 public class Options
 {
+    [Option("compile", HelpText = "Compile edited source assets into copies of their original archives.")]
+    public bool Compile
+    {
+        get; set;
+    }
+
+    [Option("source", HelpText = "Edited source file, package directory or restored project directory.")]
+    public string? SourcePath
+    {
+        get; set;
+    }
+
+    [Option("asset", HelpText = "Indexed asset path to compile; omit with --project.")]
+    public string? AssetPath
+    {
+        get; set;
+    }
+
     [Option("index", HelpText = "Asset index JSON for decoded asset extraction.")]
     public string? AssetIndexPath
     {
@@ -34,13 +52,13 @@ public class Options
         get; set;
     }
 
-    [Option("project", HelpText = "Restore a Gii source asset tree and write a recovery report beside it.")]
+    [Option("project", HelpText = "Restore a Gii source tree, or compile it with --compile --source.")]
     public bool Project
     {
         get; set;
     }
 
-    [Option("type", HelpText = "Extract only this indexed asset type (requires --assets).")]
+    [Option("type", HelpText = "Select one indexed asset type for extraction or project compilation.")]
     public string? AssetType
     {
         get; set;
@@ -70,13 +88,13 @@ public class Options
         get; set;
     }
 
-    [Option("input_dir", HelpText = "Input directory for --recursive, --assets or --pack.")]
+    [Option("input_dir", HelpText = "Archive directory for extraction, compilation or packing.")]
     public string? InputDirectoryPath
     {
         get; set;
     }
 
-    [Option("overlay", HelpText = "Overlay archive directory, e.g. content_dlc (requires --assets).")]
+    [Option("overlay", HelpText = "Overlay archive directory for indexed assets, e.g. content_dlc.")]
     public string? OverlayDirectoryPath
     {
         get; set;
@@ -94,7 +112,7 @@ public class Options
         get; set;
     }
 
-    [Option('o', "output_dir", HelpText = "Extraction output directory.")]
+    [Option('o', "output_dir", HelpText = "Extraction or compilation output directory.")]
     public string? OutputDirectoryPath
     {
         get; set;
