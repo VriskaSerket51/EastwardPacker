@@ -1,7 +1,33 @@
+# .NET build output
 bin/
 obj/
-/build/
+build/
 /publish/
 /packages/
-riderModule.iml
-/_ReSharper.Caches/
+*.nupkg
+*.snupkg
+
+# Local IDE settings
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.iml
+_ReSharper.Caches/
+
+# Native build output
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
