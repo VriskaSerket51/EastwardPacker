@@ -1,16 +1,15 @@
-﻿using EastwardLib.Assets;
+using EastwardLib.Assets;
 
 foreach (var arg in args)
 {
     try
     {
-        var s = File.OpenRead(arg);
-        HmgAsset asset = new HmgAsset();
-        asset.Decode(s);
-        asset.SaveTo(arg);
+        using var stream = File.OpenRead(arg);
+        Asset.Create<HmgAsset>(stream).SaveTo(arg + ".png");
     }
     catch (Exception e)
     {
-        Console.WriteLine($"Exception from {arg}, message: {e.Message}");
+        Console.Error.WriteLine($"{arg}: {e.Message}");
+        Environment.ExitCode = 1;
     }
 }

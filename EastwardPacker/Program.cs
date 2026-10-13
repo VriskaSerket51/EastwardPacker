@@ -1,48 +1,138 @@
-﻿using CommandLine;
+using CommandLine;
 using EastwardLib.Assets;
-using EastwardLib.MetaData;
+using EastwardLib.Utils;
 using EastwardPacker;
 
-#if DEBUG
-Test.DoTest();
-#else
 Parser.Default.ParseArguments<Options>(args)
-    .WithParsed(OnParsed);
-#endif
+    .WithParsed(OnParsed)
+    .WithNotParsed(_ => Environment.ExitCode = 1);
 
-void OnParsed(Options o)
+void OnParsed(Options options)
 {
-    ScriptLibrary.Create(o.ScriptLibraryPath);
-    AssetIndex.Create(o.AssetIndexPath);
-
-    if (o.Recursive)
+    try
     {
-        if (o.InputDirectoryPath == null)
+        if (options.Pack)
         {
-            Console.WriteLine("'input_dir' should not be null on recursive mode!!!");
-            return;
-        }
-
-        foreach (var file in Directory.GetFiles(o.InputDirectoryPath, "*.*", SearchOption.AllDirectories))
-        {
-            if (!file.EndsWith(".g"))
+            if (options.Assets || options.Project || options.InputDirectoryPath == null || options.OutputFilePath == null)
             {
-                continue;
+                throw new ArgumentException("--pack requires --input_dir and --output; asset source compilation is not supported.");
             }
 
-            var g = GArchive.Read(file);
-            g.ExtractTo(Path.Combine(o.OutputDirectoryPath, Path.GetFileName(file)));
-        }
-    }
-    else
-    {
-        if (o.InputFilePath == null)
-        {
-            Console.WriteLine("'input' should not be null!!!");
+            var input = Path.GetFullPath(options.InputDirectoryPath);
+            var output = Path.GetFullPath(options.OutputFilePath);
+            if (output.StartsWith(input + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Place the output archive outside its input directory.");
+            }
+
+            var archive = GArchive.Create(Path.GetFileNameWithoutExtension(output));
+            foreach (var file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal))
+            {
+                archive.Add(archive.ArchiveName + "/" + Path.GetRelativePath(input, file).Replace('\\', '/'), File.ReadAllBytes(file));
+            }
+
+            archive.Write(output);
+            Console.WriteLine($"Packed {archive.Count} files: {output}");
             return;
         }
+        if (options.OutputDirectoryPath == null)
+        {
+            throw new ArgumentException("Extraction requires --output_dir.");
+        }
 
-        var g = GArchive.Read(o.InputFilePath);
-        g.ExtractTo(Path.Combine(o.OutputDirectoryPath, Path.GetFileName(o.InputFilePath)));
+        if (options.Assets || options.Project)
+        {
+            if (options.Assets && options.Project)
+            {
+                throw new ArgumentException("Choose --assets or --project.");
+            }
+
+            using var decompiler = options.LuaSource || options.Project ? new NativeLuaDecompiler(options.DecompilerPath) : null;
+            var manager = options.ConfigPath != null ? AssetManager.Create(options.ConfigPath)
+                : options.AssetIndexPath != null && options.ScriptLibraryPath != null && options.TextureIndexPath != null
+                    ? AssetManager.Create(options.AssetIndexPath, options.ScriptLibraryPath, options.TextureIndexPath)
+                    : throw new ArgumentException("--assets requires --config or --index, --script_lib and --texture_index.");
+            if (options.InputDirectoryPath != null)
+            {
+                manager.RootDirectory = options.InputDirectoryPath;
+                foreach (var path in Directory.EnumerateFiles(options.InputDirectoryPath, "*.g", SearchOption.AllDirectories))
+                {
+                    manager.LoadArchive(GArchive.Read(path));
+                }
+            }
+            else if (options.InputFilePath != null)
+            {
+                manager.LoadArchive(GArchive.Read(options.InputFilePath));
+            }
+            else
+            {
+                throw new ArgumentException("--assets requires --input_dir or --input.");
+            }
+
+            if (options.OverlayDirectoryPath != null)
+            {
+                foreach (var path in Directory.EnumerateFiles(options.OverlayDirectoryPath, "*.g", SearchOption.AllDirectories))
+                {
+                    manager.LoadArchive(GArchive.Read(path));
+                }
+            }
+
+            var failures = 0;
+            if (decompiler != null)
+            {
+                manager.LuaDecompiler = decompiler.Decompile;
+            }
+
+            if (options.Project)
+            {
+                var report = new ProjectReconstructor(manager).SaveTo(options.OutputDirectoryPath, options.AssetType == null ? null : info => info.Type == options.AssetType,
+                    (completed, total, name) => { if (completed % 1000 == 0 || completed == total) { Console.WriteLine($"Restored {completed}/{total}: {name}"); } });
+                Console.WriteLine($"Source restoration: {report.Restored.Count} physical assets, {report.VirtualAssets} virtual assets, {report.Unavailable.Count} unavailable resources.");
+                foreach (var (name, reason) in report.Unavailable)
+                {
+                    Console.Error.WriteLine($"{name}: {reason}");
+                }
+
+                return;
+            }
+            foreach (var info in manager.Assets.Values.Where(info => info.Type != "folder" && (options.AssetType == null || info.Type == options.AssetType)))
+            {
+                try
+                {
+                    manager.LoadAsset(info.AssetName);
+                }
+                catch (Exception e) { failures++; Console.Error.WriteLine($"{info.AssetName}: {e.Message}"); }
+            }
+            manager.ExtractTo(options.OutputDirectoryPath, options.LuaSource, (name, error) =>
+            {
+                failures++;
+                Console.Error.WriteLine($"{name}: {error.Message}");
+            });
+            if (failures > 0)
+            {
+                Environment.ExitCode = 1;
+            }
+
+            return;
+        }
+        if (options.AssetType != null || options.LuaSource || options.DecompilerPath != null || options.OverlayDirectoryPath != null)
+        {
+            throw new ArgumentException("--type, --lua-source, --decompiler and --overlay require --assets or --project.");
+        }
+
+        var files = options.Recursive
+            ? options.InputDirectoryPath != null ? Directory.EnumerateFiles(options.InputDirectoryPath, "*.g", SearchOption.AllDirectories) : throw new ArgumentException("--recursive requires --input_dir.")
+            : options.InputFilePath != null ? new[] { options.InputFilePath } : throw new ArgumentException("Extraction requires --input.");
+        foreach (var file in files)
+        {
+            var archive = GArchive.Read(file);
+            archive.ExtractTo(options.OutputDirectoryPath);
+            Console.WriteLine($"Extracted {archive.Count} files: {archive.ArchiveName}");
+        }
+    }
+    catch (Exception e)
+    {
+        Console.Error.WriteLine(e.Message);
+        Environment.ExitCode = 1;
     }
 }

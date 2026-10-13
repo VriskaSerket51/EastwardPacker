@@ -1,21 +1,14 @@
-﻿using System.Drawing;
 using EastwardLib.Assets;
 
 foreach (var arg in args)
 {
     try
     {
-        if (!File.Exists(arg))
-        {
-            continue;
-        }
-
-        var asset = new HmgAsset(Image.FromFile(arg));
-        var data = asset.Encode();
-        File.WriteAllBytes(arg + ".hmg", data);
+        File.WriteAllBytes(arg + ".hmg", HmgAsset.FromImage(arg).Encode());
     }
     catch (Exception e)
     {
-        Console.WriteLine($"Exception from {arg}, message: {e.Message}");
+        Console.Error.WriteLine($"{arg}: {e.Message}");
+        Environment.ExitCode = 1;
     }
 }

@@ -1,24 +1,102 @@
-﻿using CommandLine;
+using CommandLine;
 
 namespace EastwardPacker;
 
 public class Options
 {
-    [Option("index", Required = true, HelpText = "Set AssetIndex path.")]
-    public required string AssetIndexPath { get; set; }
-    
-    [Option("script_lib", Required = true, HelpText = "Set ScriptLibrary path.")]
-    public required string ScriptLibraryPath { get; set; }
+    [Option("index", HelpText = "Asset index JSON for decoded asset extraction.")]
+    public string? AssetIndexPath
+    {
+        get; set;
+    }
 
-    [Option("r", Required = false, HelpText = "Whether use recursive mode or not.", Default = false)]
-    public bool Recursive { get; set; }
+    [Option("script_lib", HelpText = "Script library JSON for decoded asset extraction.")]
+    public string? ScriptLibraryPath
+    {
+        get; set;
+    }
 
-    [Option('i', "input", Required = false, HelpText = "Set Input file path.")]
-    public string? InputFilePath { get; set; }
+    [Option("texture_index", HelpText = "Texture index JSON for decoded asset extraction.")]
+    public string? TextureIndexPath
+    {
+        get; set;
+    }
 
-    [Option("input_dir", Required = false, HelpText = "Set Input directory path (recursive mode only).")]
-    public string? InputDirectoryPath { get; set; }
+    [Option("config", HelpText = "config.g for decoded asset extraction.")]
+    public string? ConfigPath
+    {
+        get; set;
+    }
 
-    [Option('o', "output_dir", Required = true, HelpText = "Set Output directory path.")]
-    public required string OutputDirectoryPath { get; set; }
+    [Option("assets", HelpText = "Decode indexed assets instead of extracting archive bytes.")]
+    public bool Assets
+    {
+        get; set;
+    }
+
+    [Option("project", HelpText = "Restore a Gii source asset tree and write a recovery report beside it.")]
+    public bool Project
+    {
+        get; set;
+    }
+
+    [Option("type", HelpText = "Extract only this indexed asset type (requires --assets).")]
+    public string? AssetType
+    {
+        get; set;
+    }
+
+    [Option("pack", HelpText = "Pack the files below --input_dir into --output.")]
+    public bool Pack
+    {
+        get; set;
+    }
+
+    [Option("output", HelpText = "Output .g file for --pack.")]
+    public string? OutputFilePath
+    {
+        get; set;
+    }
+
+    [Option('r', "recursive", HelpText = "Read all .g archives below --input_dir.")]
+    public bool Recursive
+    {
+        get; set;
+    }
+
+    [Option('i', "input", HelpText = "Input .g archive.")]
+    public string? InputFilePath
+    {
+        get; set;
+    }
+
+    [Option("input_dir", HelpText = "Input directory for --recursive, --assets or --pack.")]
+    public string? InputDirectoryPath
+    {
+        get; set;
+    }
+
+    [Option("overlay", HelpText = "Overlay archive directory, e.g. content_dlc (requires --assets).")]
+    public string? OverlayDirectoryPath
+    {
+        get; set;
+    }
+
+    [Option("lua-source", HelpText = "Decompile LuaJIT only when exporting Lua source (requires --assets).")]
+    public bool LuaSource
+    {
+        get; set;
+    }
+
+    [Option("decompiler", HelpText = "Optional path to eastward-luajit.dll, libeastward-luajit.so or .dylib.")]
+    public string? DecompilerPath
+    {
+        get; set;
+    }
+
+    [Option('o', "output_dir", HelpText = "Extraction output directory.")]
+    public string? OutputDirectoryPath
+    {
+        get; set;
+    }
 }

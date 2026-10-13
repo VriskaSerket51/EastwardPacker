@@ -1,62 +1,27 @@
-﻿using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Text.Json.Nodes;
 using EastwardLib.Assets;
-using SimpleJSON;
-
+using EastwardLib.Utils;
 
 foreach (var arg in args)
 {
-    var dir = Path.GetDirectoryName(arg);
-    if (dir == null)
+    try
     {
-        continue;
+        var path = Path.GetFullPath(arg);
+        var directory = Path.GetDirectoryName(path)!;
+        var json = File.ReadAllText(path);
+        var definition = JsonNode.Parse(json) ?? throw new InvalidDataException("Missing atlas index");
+        var files = new Dictionary<string, Asset>(StringComparer.Ordinal) { ["atlas.json"] = new TextAsset(json) };
+        foreach (var atlas in definition["atlases"]!.AsArray())
+        {
+            var name = atlas!["name"]!.GetValue<string>();
+            var bytes = File.ReadAllBytes(SafePath.ResolveWithin(directory, name));
+            files[name] = bytes.AsSpan().StartsWith("PGF"u8) ? Asset.Create<HmgAsset>(bytes) : new BinaryAsset(bytes);
+        }
+        new AtlasAsset(files).SaveTo(Path.Combine(directory, Path.GetFileNameWithoutExtension(path) + "-extracted"));
     }
-
-    var json = File.ReadAllText(arg);
-    var atlasNode = JSONNode.Parse(json);
-    var atlasesNode = atlasNode["atlases"].AsArray;
-    Dictionary<int, Image> atlases = new Dictionary<int, Image>(atlasesNode.Count);
-    for (var i = 0; i < atlasesNode.Count; i++)
+    catch (Exception e)
     {
-        var value = atlasesNode[i];
-        string name = value["name"].Value;
-        try
-        {
-            var s = File.OpenRead(Path.Combine(dir, name));
-            var asset = Asset.Create<HmgAsset>(s);
-            asset.SaveTo(Path.Combine(dir, name));
-            atlases.Add(i, Image.FromFile(Path.Combine(dir, name)));
-        }
-        catch
-        {
-            atlases.Add(i, Image.FromFile(Path.Combine(dir, name)));
-        }
-    }
-
-    var itemsNode = atlasNode["items"].AsArray;
-    foreach (var (_, value) in itemsNode)
-    {
-        string name = value["name"].Value;
-        string path = Path.Combine(dir, name);
-        string? dirPath = Path.GetDirectoryName(path);
-        if (dirPath == null)
-        {
-            continue;
-        }
-
-        if (!Directory.Exists(dirPath))
-        {
-            Directory.CreateDirectory(dirPath);
-        }
-
-        int atlasIdx = value["atlas"].AsInt;
-        var rectNode = value["rect"];
-        Rectangle rect = new Rectangle(rectNode[0].AsInt, rectNode[1].AsInt, rectNode[2].AsInt, rectNode[3].AsInt);
-        using var bitmap = new Bitmap(rect.Width, rect.Height);
-        using var g = Graphics.FromImage(bitmap);
-        g.InterpolationMode = InterpolationMode.NearestNeighbor;
-        g.PixelOffsetMode = PixelOffsetMode.Half;
-        g.DrawImage(atlases[atlasIdx], rect with { X = 0, Y = 0 }, rect, GraphicsUnit.Pixel);
-        bitmap.Save(path);
+        Console.Error.WriteLine($"{arg}: {e.Message}");
+        Environment.ExitCode = 1;
     }
 }
