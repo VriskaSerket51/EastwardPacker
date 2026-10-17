@@ -11,4 +11,5 @@
       <ProjectReference Include="..\EastwardLib\EastwardLib.csproj" />
     </ItemGroup>
 
+  <Import Project="../Licenses.targets" />
 </Project>

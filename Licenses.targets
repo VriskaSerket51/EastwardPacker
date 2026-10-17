@@ -1,0 +1,16 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Link="licenses/EastwardPacker-GPL-3.0.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)NOTICE" Link="licenses/EastwardPacker-NOTICE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)licenses/**/*" Link="licenses/EastwardPacker/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="IncludeRuntimeLicenseFiles" AfterTargets="ComputeFilesToPublish" DependsOnTargets="ResolveFrameworkReferences" Condition="'$(SelfContained)' == 'true'">
+    <PropertyGroup>
+      <_LicenseFrameworkNames>@(FrameworkReference)</_LicenseFrameworkNames>
+    </PropertyGroup>
+    <ItemGroup>
+      <_RuntimeLicenses Include="@(ResolvedRuntimePack->'%(PackageDirectory)/LICENSE.TXT');@(ResolvedRuntimePack->'%(PackageDirectory)/THIRD-PARTY-NOTICES.TXT')" />
+      <ResolvedFileToPublish Include="@(_RuntimeLicenses)" Condition="Exists('%(_RuntimeLicenses.Identity)') and $([System.String]::Copy('$(_LicenseFrameworkNames)').Contains('%(_RuntimeLicenses.FrameworkName)'))" RelativePath="licenses/EastwardPacker/runtime/%(_RuntimeLicenses.NuGetPackageId)/%(_RuntimeLicenses.Filename)%(_RuntimeLicenses.Extension)" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

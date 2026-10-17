@@ -1,0 +1,8 @@
+EastwardPacker
+
+GNU General Public License version 3. See LICENSE.
+
+Third-party components retain their own licenses and copyright notices.
+The resolved NuGet dependencies and license texts are listed in licenses/nuget/packages.json.
+
+Source: https://github.com/VriskaSerket51/EastwardPacker
