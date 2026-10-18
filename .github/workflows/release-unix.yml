@@ -72,7 +72,6 @@ jobs:
         run: |
           mkdir -p smoke/input
           printf 'Eastward release test' > smoke/input/test.txt
-          publish/EastwardPacker/EastwardPacker --version
           publish/EastwardPacker/EastwardPacker --pack --input_dir smoke/input --output smoke/release.g
           publish/EastwardPacker/EastwardPacker --input smoke/release.g --output_dir smoke/extracted
           cmp smoke/input/test.txt smoke/extracted/release/test.txt
