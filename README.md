@@ -3,13 +3,11 @@ EastwardPacker
 
 English | [한국어](README.ko.md)
 
+Unofficial command-line tools for extracting and repacking Eastward archives and assets.
+
 ## eastward.js
 
 A [JavaScript version](https://github.com/VriskaSerket51/eastward.js) is also available!
-
-## Download
-
-Get releases [here](https://github.com/VriskaSerket51/EastwardPacker/releases).
 
 ## How to build
 
@@ -49,21 +47,21 @@ Files are extracted to `raw/<archive name>/...`. Use the directory inside it as 
 
 ### Asset extraction
 
-Use the index to extract assets with their original filenames:
+Extract assets using the names and paths recorded in the index:
 
 ```sh
 dotnet run --project EastwardPacker -- --assets --config /path/to/content/game/config.g --input_dir /path/to/content/game --overlay /path/to/content_dlc -o ./assets
 ```
 
-Select a type with options such as `--type texture`. To extract source from Lua bytecode, add `--lua-source --decompiler /path/to/native-library`.
+Select a type with options such as `--type texture`. To convert LuaJIT bytecode to Lua code, add `--lua-source --decompiler /path/to/native-library`. The result may differ from the original source.
 
-### Source restoration
+### Exporting editable files
 
 ```sh
 dotnet run --project EastwardPacker -- --project --config /path/to/content/game/config.g --input_dir /path/to/content/game -o ./restored --decompiler /path/to/native-library
 ```
 
-Sources are saved in `game/asset`. Original project settings and editing information absent from the shipped game cannot be restored.
+Exported files are saved in `game/asset`. Original project settings and editing information absent from the shipped game cannot be restored.
 
 ### Source compilation
 
@@ -71,7 +69,7 @@ Sources are saved in `game/asset`. Original project settings and editing informa
 dotnet run --project EastwardPacker -- --compile --asset script/example.sq --source ./edited/example.sq --config /path/to/content/game/config.g --input_dir /path/to/content/game -o ./compiled
 ```
 
-Use `--project` instead of `--asset` for an entire restored tree. Keep `.eastward-project.json` in the project root. Add `--overlay` for DLC. Write the output to a new directory outside the game.
+Use `--project` instead of `--asset` for an entire exported file tree. Keep `.eastward-project.json` in the project root. Use `--overlay` to select a directory containing installed DLC archives. Write the output to a new directory outside the game.
 
 ## Tools
 
